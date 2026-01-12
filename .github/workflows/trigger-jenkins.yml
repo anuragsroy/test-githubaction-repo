@@ -1,0 +1,25 @@
+name: Trigger Jenkins Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  
+
+jobs:
+  trigger:
+    runs-on: windows-latest
+
+    steps:
+      - name: Trigger Jenkins Job
+        shell: pwsh
+        run: |
+          $url = "${{ secrets.JENKINS_URL }}/job/${{ secrets.JENKINS_JOB }}/build?token=${{ secrets.JENKINS_TRIGGER_TOKEN }}"
+
+          Invoke-RestMethod `
+            -Uri $url `
+            -Method Post `
+            -Headers @{
+              Authorization = "Basic $([Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes('${{ secrets.JENKINS_USER }}:${{ secrets.JENKINS_API_TOKEN }}')))"
+            }
+
